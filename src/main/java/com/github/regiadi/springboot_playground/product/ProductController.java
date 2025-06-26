@@ -1,4 +1,4 @@
-package com.github.regiadi.springboot_playground;
+package com.github.regiadi.springboot_playground.product;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

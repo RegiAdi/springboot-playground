@@ -1,4 +1,4 @@
-package com.github.regiadi.springboot_playground;
+package com.github.regiadi.springboot_playground.product;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

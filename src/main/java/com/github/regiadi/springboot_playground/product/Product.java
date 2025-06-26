@@ -1,4 +1,4 @@
-package com.github.regiadi.springboot_playground;
+package com.github.regiadi.springboot_playground.product;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
