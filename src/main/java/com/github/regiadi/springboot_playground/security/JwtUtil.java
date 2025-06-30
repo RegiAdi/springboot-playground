@@ -13,6 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Utility class for handling JSON Web Tokens (JWT).
+ * Provides methods for generating, validating, and extracting information from
+ * JWTs.
+ */
 @Component
 public class JwtUtil {
 
@@ -22,11 +27,25 @@ public class JwtUtil {
 	@Value("${jwt.expiration}")
 	private long expiration; // in milliseconds
 
+	/**
+	 * Generates a JWT for a given user.
+	 * The username is used as the subject of the token.
+	 *
+	 * @param userDetails The user details from which to create the token.
+	 * @return A JWT string.
+	 */
 	public String generateToken(UserDetails userDetails) {
 		Map<String, Object> claims = new HashMap<>();
 		return createToken(claims, userDetails.getUsername());
 	}
 
+	/**
+	 * Creates a JWT with the specified claims and subject.
+	 * 
+	 * @param claims  Additional claims to include in the token.
+	 * @param subject The subject of the token (typically the username).
+	 * @return The generated JWT string.
+	 */
 	private String createToken(Map<String, Object> claims, String subject) {
 		return Jwts.builder()
 				.claims(claims)
@@ -37,24 +56,59 @@ public class JwtUtil {
 				.compact();
 	}
 
+	/**
+	 * Validates the given JWT.
+	 * A token is considered valid if the username matches and it has not expired.
+	 *
+	 * @param token       The JWT to validate.
+	 * @param userDetails The user details to validate against.
+	 * @return true if the token is valid, false otherwise.
+	 */
 	public Boolean validateToken(String token, UserDetails userDetails) {
 		final String username = extractUsername(token);
 		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
 	}
 
+	/**
+	 * Extracts the username (subject) from the JWT token.
+	 *
+	 * @param token The JWT from which to extract the username.
+	 * @return The username from the token.
+	 */
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);
 	}
 
+	/**
+	 * Extracts the expiration date from the JWT token.
+	 *
+	 * @param token The JWT from which to extract the expiration date.
+	 * @return The expiration date of the token.
+	 */
 	public Date extractExpiration(String token) {
 		return extractClaim(token, Claims::getExpiration);
 	}
 
+	/**
+	 * A generic method to extract a specific claim from the token.
+	 *
+	 * @param <T>            The type of the claim.
+	 * @param token          The JWT from which to extract the claim.
+	 * @param claimsResolver A function to apply to the claims to extract the
+	 *                       desired value.
+	 * @return The extracted claim.
+	 */
 	private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
 		final Claims claims = extractAllClaims(token);
 		return claimsResolver.apply(claims);
 	}
 
+	/**
+	 * Parses the JWT and returns all its claims.
+	 *
+	 * @param token The JWT to parse.
+	 * @return The claims (payload) contained in the token.
+	 */
 	private Claims extractAllClaims(String token) {
 		return Jwts.parser()
 				.verifyWith(getSigningKey())
@@ -63,10 +117,25 @@ public class JwtUtil {
 				.getPayload();
 	}
 
+	/**
+	 * Checks if the token has expired.
+	 * 
+	 * @param token The JWT to check.
+	 * @return true if the token has expired, false otherwise.
+	 */
 	private Boolean isTokenExpired(String token) {
 		return extractExpiration(token).before(new Date());
 	}
 
+	/**
+	 * Creates a signing key from the configured Base64-encoded secret.
+	 * The key is validated to ensure it meets the minimum length requirement for
+	 * HMAC-SHA algorithms (256 bits).
+	 *
+	 * @return A {@link SecretKey} used for signing and verifying JWTs.
+	 * @throws IllegalArgumentException if the decoded secret key is less than 256
+	 *                                  bits (32 bytes).
+	 */
 	private SecretKey getSigningKey() { // Change return type from Key to SecretKey
 		byte[] keyBytes = Decoders.BASE64.decode(secret);
 
@@ -77,4 +146,5 @@ public class JwtUtil {
 
 		return Keys.hmacShaKeyFor(keyBytes); // This method already returns SecretKey
 	}
+
 }
