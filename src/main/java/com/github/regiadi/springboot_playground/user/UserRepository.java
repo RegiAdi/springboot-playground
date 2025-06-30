@@ -11,4 +11,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 	// Spring Data JPA will automatically implement this method based on
 	// the method name
 	Optional<User> findByUsername(String username);
+
+	Optional<User> findByEmail(String email);
 }

@@ -1,5 +1,6 @@
 package com.github.regiadi.springboot_playground.user;
 
+import com.github.regiadi.springboot_playground.exception.DuplicateResourceException;
 import com.github.regiadi.springboot_playground.user.dto.UpdateUserRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,13 +44,24 @@ public class UserService {
 	/**
 	 * Creates a new user, hashing their password before saving.
 	 * 
-	 * @param user The user to save.
+	 * @param user The user entity to create.
 	 * @return The saved user.
+	 * @throws DuplicateResourceException if the username or email is already
+	 *                                    taken.
 	 */
 	public User createUser(User user) {
+		// Check if username is already taken
+		if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+			throw new DuplicateResourceException("Username is already taken");
+		}
+
+		// Check if email is already taken
+		if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+			throw new DuplicateResourceException("Email is already taken");
+		}
+
 		// Encode the password before saving
-		String encodedPassword = passwordEncoder.encode(user.getPassword());
-		user.setPassword(encodedPassword);
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		return userRepository.save(user);
 	}
 
