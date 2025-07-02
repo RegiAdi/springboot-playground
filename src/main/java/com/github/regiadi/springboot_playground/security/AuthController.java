@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST controller for handling user authentication.
+ * Provides an endpoint for users to log in and receive a JWT token.
+ */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -29,9 +33,23 @@ public class AuthController {
 		this.jwtUtil = jwtUtil;
 	}
 
+	/**
+	 * Authenticates a user and returns a JWT token upon successful authentication.
+	 * If authentication fails (e.g., bad credentials), a 401 Unauthorized
+	 * response is sent,
+	 * as configured in
+	 * {@link com.github.regiadi.springboot_playground.config.SecurityConfig}.
+	 * <p>
+	 * HTTP Method: {@code POST} <br>
+	 * Path: {@code /api/auth/login}
+	 *
+	 * @param authRequest The request body containing the user's credentials
+	 *                    (username and password).
+	 * @return A {@link ResponseEntity} containing the JWT in an
+	 *         {@link AuthResponseDTO} and an HTTP 200 OK status.
+	 */
 	@PostMapping("/login")
-	public ResponseEntity<AuthResponseDTO> createAuthenticationToken(@RequestBody AuthRequestDTO authRequest)
-			throws Exception {
+	public ResponseEntity<AuthResponseDTO> createAuthenticationToken(@RequestBody AuthRequestDTO authRequest) {
 		authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
 

@@ -15,18 +15,57 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * A filter that intercepts incoming HTTP requests to validate JWTs.
+ * This filter extends {@link OncePerRequestFilter} to ensure it is executed
+ * once per request.
+ * <p>
+ * It performs the following steps:
+ * <ol>
+ * <li>Extracts the JWT from the 'Authorization' header.</li>
+ * <li>Parses the token to get the username.</li>
+ * <li>If a username is found and no user is currently authenticated in the
+ * {@link SecurityContextHolder},
+ * it loads the user details using {@link UserDetailsService}.</li>
+ * <li>Validates the token's signature and expiration against the user
+ * details.</li>
+ * <li>If the token is valid, it creates an
+ * {@link UsernamePasswordAuthenticationToken} and sets it
+ * in the {@link SecurityContextHolder}, effectively authenticating the user for
+ * the duration of the request.</li>
+ * </ol>
+ * This filter is added before the standard
+ * {@link org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter}
+ * in the security configuration.
+ */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtUtil jwtUtil;
 	private final UserDetailsService userDetailsService;
 
-	@Autowired
+	/**
+	 * Constructs a new {@code JwtAuthenticationFilter}.
+	 *
+	 * @param jwtUtil            The utility class for JWT operations (generation,
+	 *                           validation, extraction).
+	 * @param userDetailsService The service to load user-specific data.
+	 */
 	public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
 		this.jwtUtil = jwtUtil;
 		this.userDetailsService = userDetailsService;
 	}
 
+	/**
+	 * Performs the actual filtering logic for JWT authentication.
+	 *
+	 * @param request     The incoming {@link HttpServletRequest}.
+	 * @param response    The outgoing {@link HttpServletResponse}.
+	 * @param filterChain The {@link FilterChain} to pass the request along to the
+	 *                    next filter.
+	 * @throws ServletException If a servlet-specific error occurs.
+	 * @throws IOException      If an I/O error occurs.
+	 */
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
