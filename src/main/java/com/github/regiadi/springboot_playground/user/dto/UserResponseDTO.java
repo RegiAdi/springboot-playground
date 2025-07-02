@@ -1,5 +1,6 @@
 package com.github.regiadi.springboot_playground.user.dto;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class UserResponseDTO {
@@ -7,6 +8,8 @@ public class UserResponseDTO {
 	private UUID id;
 	private String username;
 	private String email;
+	private LocalDateTime createdAt;
+	private LocalDateTime updatedAt;
 
 	// Getters and Setters
 	public UUID getId() {
@@ -31,5 +34,21 @@ public class UserResponseDTO {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
 	}
 }
