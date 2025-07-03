@@ -57,19 +57,6 @@ public class JwtUtil {
 	}
 
 	/**
-	 * Validates the given JWT.
-	 * A token is considered valid if the username matches and it has not expired.
-	 *
-	 * @param token       The JWT to validate.
-	 * @param userDetails The user details to validate against.
-	 * @return true if the token is valid, false otherwise.
-	 */
-	public Boolean validateToken(String token, UserDetails userDetails) {
-		final String username = extractUsername(token);
-		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-	}
-
-	/**
 	 * Extracts the username (subject) from the JWT token.
 	 *
 	 * @param token The JWT from which to extract the username.
@@ -77,16 +64,6 @@ public class JwtUtil {
 	 */
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);
-	}
-
-	/**
-	 * Extracts the expiration date from the JWT token.
-	 *
-	 * @param token The JWT from which to extract the expiration date.
-	 * @return The expiration date of the token.
-	 */
-	public Date extractExpiration(String token) {
-		return extractClaim(token, Claims::getExpiration);
 	}
 
 	/**
@@ -115,16 +92,6 @@ public class JwtUtil {
 				.build()
 				.parseSignedClaims(token)
 				.getPayload();
-	}
-
-	/**
-	 * Checks if the token has expired.
-	 * 
-	 * @param token The JWT to check.
-	 * @return true if the token has expired, false otherwise.
-	 */
-	private Boolean isTokenExpired(String token) {
-		return extractExpiration(token).before(new Date());
 	}
 
 	/**

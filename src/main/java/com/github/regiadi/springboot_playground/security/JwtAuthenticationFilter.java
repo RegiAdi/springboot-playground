@@ -1,10 +1,13 @@
 package com.github.regiadi.springboot_playground.security;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,6 +43,8 @@ import java.io.IOException;
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+	private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
 	private final JwtUtil jwtUtil;
 	private final UserDetailsService userDetailsService;
@@ -78,22 +83,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			jwt = authorizationHeader.substring(7);
 			try {
 				username = jwtUtil.extractUsername(jwt);
-			} catch (Exception e) {
-				// Log exception, e.g., token expired, invalid signature
-				logger.warn("JWT Token error: " + e.getMessage());
+			} catch (ExpiredJwtException e) {
+				logger.warn("JWT token has expired: {}", e.getMessage());
+			} catch (JwtException e) {
+				// Catches other JWT-related exceptions like MalformedJwtException,
+				// SignatureException, etc.
+				logger.warn("Error parsing JWT token: {}", e.getMessage());
 			}
 		}
 
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-			if (jwtUtil.validateToken(jwt, userDetails)) {
-				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-						userDetails, null, userDetails.getAuthorities());
-				usernamePasswordAuthenticationToken
-						.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-			}
+			// The token's validity (signature, expiration) is checked by
+			// jwtUtil.extractUsername.
+			// If it's invalid, an exception is thrown and caught above.
+			// If we reach here, the token is valid, and we can set the authentication.
+			UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+					userDetails, null, userDetails.getAuthorities());
+			usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+			SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 		}
 		filterChain.doFilter(request, response);
 	}
