@@ -77,3 +77,17 @@ Here are some of the main endpoints available:
 *   `DELETE /api/users/{id}`: Delete a user (requires authentication).
 
 *(Note: A default user is not created. You must first use the `POST /api/users` endpoint to create a user before you can log in.)*
+
+## Testing
+
+This project includes a comprehensive suite of unit and integration tests to ensure code quality and correctness.
+
+*   **Controller Tests:** Use `MockMvc` to test the web layer in isolation.
+*   **Utility Tests:** Unit tests for critical components like `JwtUtil`.
+*   **Custom Test Logger:** A custom JUnit 5 extension (`TestDisplayNameExtension`) provides clear, real-time console output for test execution status.
+
+To run all tests, execute the following command from the project's root directory:
+
+```sh
+./mvnw test
+```
