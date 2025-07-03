@@ -13,10 +13,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.github.regiadi.springboot_playground.security.JwtAuthenticationFilter;
-import org.springframework.http.HttpStatus;
+import com.github.regiadi.springboot_playground.security.CustomAuthenticationEntryPoint;
 
 @Configuration
 public class SecurityConfig {
@@ -37,15 +36,15 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(
 			HttpSecurity http,
-			JwtAuthenticationFilter jwtAuthenticationFilter)
+			JwtAuthenticationFilter jwtAuthenticationFilter,
+			CustomAuthenticationEntryPoint customAuthenticationEntryPoint)
 			throws Exception {
 		http.csrf(AbstractHttpConfigurer::disable) // Disable CSRF for stateless APIs
 				// Set session management to stateless
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
 				.exceptionHandling(exception -> exception
-						// Handle unauthorized access
-						.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+						.authenticationEntryPoint(customAuthenticationEntryPoint))
 
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/monitor/**").permitAll() // Allow public access to monitoring endpoints
