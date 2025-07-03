@@ -1,0 +1,22 @@
+meta {
+  name: createProduct
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL}}/products
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{JWT}}
+}
+
+body:json {
+  {
+    "name": "Ultra Milk Susu UHT Full Cream Kotak 250 ml",
+    "price": 8100
+  }
+}
