@@ -1,7 +1,12 @@
 package com.github.regiadi.springboot_playground.security.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class AuthRequestDTO {
+	@NotBlank(message = "Username cannot be blank")
 	private String username;
+
+	@NotBlank(message = "Password cannot be blank")
 	private String password;
 
 	// No-argument constructor for JSON deserialization

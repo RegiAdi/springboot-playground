@@ -2,6 +2,7 @@ package com.github.regiadi.springboot_playground.security;
 
 import com.github.regiadi.springboot_playground.security.dto.AuthRequestDTO;
 import com.github.regiadi.springboot_playground.security.dto.AuthResponseDTO;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -46,7 +47,7 @@ public class AuthController {
 	 *         {@link AuthResponseDTO} and an HTTP 200 OK status.
 	 */
 	@PostMapping("/login")
-	public ResponseEntity<AuthResponseDTO> createAuthenticationToken(@RequestBody AuthRequestDTO authRequest) {
+	public ResponseEntity<AuthResponseDTO> createAuthenticationToken(@Valid @RequestBody AuthRequestDTO authRequest) {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
 

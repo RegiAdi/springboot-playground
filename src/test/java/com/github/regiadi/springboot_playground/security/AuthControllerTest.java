@@ -91,4 +91,20 @@ class AuthControllerTest {
 				.andExpect(jsonPath("$.error", is("Unauthorized")))
 				.andExpect(jsonPath("$.message", is("Invalid credentials")));
 	}
+
+	@Test
+	@DisplayName("Should Return 400 Bad Request When Credentials Are Blank")
+	void createAuthenticationToken_shouldReturnBadRequest_whenCredentialsAreBlank() throws Exception {
+		// Given
+		AuthRequestDTO authRequest = new AuthRequestDTO("", "");
+
+		// When & Then
+		mockMvc.perform(post("/api/auth/login")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(authRequest)))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.error", is("Validation Failed")))
+				.andExpect(jsonPath("$.details.username", is("Username cannot be blank")))
+				.andExpect(jsonPath("$.details.password", is("Password cannot be blank")));
+	}
 }
