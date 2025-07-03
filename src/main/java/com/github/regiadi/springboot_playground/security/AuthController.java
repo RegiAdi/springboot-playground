@@ -49,7 +49,7 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<AuthResponseDTO> createAuthenticationToken(@Valid @RequestBody AuthRequestDTO authRequest) {
 		Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+				new UsernamePasswordAuthenticationToken(authRequest.username(), authRequest.password()));
 
 		// The principal from the authenticated object is the UserDetails.
 		final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
